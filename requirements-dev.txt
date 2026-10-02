@@ -1,0 +1,9 @@
+-r requirements.txt
+
+# --- Testlar ---
+pytest>=8.3
+pytest-asyncio>=0.24
+
+# --- Sifat nazorati (ixtiyoriy) ---
+# ruff>=0.8
+# mypy>=1.13

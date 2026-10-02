@@ -1,0 +1,28 @@
+# --- Muhit ---
+.env
+.venv/
+venv/
+env/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# --- Baza / ma'lumotlar ---
+data/
+*.db
+*.sqlite3
+*.log
+logs/
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini

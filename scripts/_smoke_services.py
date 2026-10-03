@@ -42,6 +42,7 @@ from bot.database.enums import (
 from bot.database.models import Category, Product
 from bot.database.repositories.catalog import CategoryRepository, ProductRepository
 from bot.database.repositories.users import CustomerRepository, UserRepository
+from bot.locales import translator
 from bot.services import (
     CartService,
     CatalogService,
@@ -55,6 +56,7 @@ from bot.services import (
     SupportService,
     SupportTooShortError,
 )
+from bot.services import presenters as pr
 
 DB_PATH = Path("data/_smoke.db")
 DB_URL = "sqlite+aiosqlite:///./data/_smoke.db"
@@ -369,6 +371,20 @@ async def smoke_notifications(session, settings: Settings, user, orders, product
     sent = await notify.low_stock([product])
     check("kam qoldiq xabari", sent == 2, sent)
     check("jurnal yozuvlari", len(bot.sent) >= 8, len(bot.sent))
+
+    # Mijoz izohi xodimga ko'rinishi kerak (xabarda ham, kartochkada ham).
+    page, _ = await orders.page_for_user(user.id, page=1, per_page=20)
+    commented = next((item for item in page if item.comment), None)
+    check("izohli buyurtma topildi", commented is not None)
+    if commented is not None:
+        bot.sent.clear()
+        await notify.order_created(commented)
+        check(
+            "izoh xodim xabarida",
+            any("Smoke test" in text for _chat_id, text in bot.sent),
+        )
+        caption = pr.staff_order_caption(translator("uz"), commented, settings.currency)
+        check("izoh xodim kartochkasida", "Smoke test" in caption, caption[-40:])
 
 
 async def run() -> int:

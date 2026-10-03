@@ -20,7 +20,7 @@ from bot.database.repositories.users import UserRepository
 from bot.locales import translator
 from bot.services import presenters as pr
 from bot.utils.money import format_money
-from bot.utils.text import escape
+from bot.utils.text import escape, truncate
 
 HTML = "HTML"
 
@@ -151,6 +151,9 @@ class NotificationService:
             address=escape(order.address or for_staff("dt_pickup")),
             source=for_staff(f"src_{order.source}"),
         )
+        if order.comment:  # mijoz izohi xodimga ham ko'rinishi kerak
+            comment_text = escape(truncate(order.comment, 300))
+            text += "\n" + for_staff("order_comment", comment=comment_text)
         return await self.notify_staff(
             text,
             kind=NotificationKind.ORDER_CREATED,

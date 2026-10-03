@@ -183,19 +183,24 @@ def order_caption(t: T, order: Order, currency: str, *, with_items: bool = True)
 
 
 def staff_order_caption(t: T, order: Order, currency: str) -> str:
-    """Xodim uchun qisqa buyurtma kartochkasi."""
+    """Xodim uchun qisqa buyurtma kartochkasi (mijoz izohi bilan)."""
     customer = order.customer_name or (order.user.display_name if order.user else None)
-    return t(
-        "admin_order_caption",
-        number=escape(order.number),
-        status=status_label(t, order.status),
-        customer=escape(customer or t("profile_unknown")),
-        phone=escape(order.customer_phone or t("profile_unknown")),
-        total=format_money(order.total, currency),
-        payment=payment_label(t, order.payment_method),
-        date=format_datetime(order.created_at),
-        source=source_label(t, order.source),
-    )
+    lines = [
+        t(
+            "admin_order_caption",
+            number=escape(order.number),
+            status=status_label(t, order.status),
+            customer=escape(customer or t("profile_unknown")),
+            phone=escape(order.customer_phone or t("profile_unknown")),
+            total=format_money(order.total, currency),
+            payment=payment_label(t, order.payment_method),
+            date=format_datetime(order.created_at),
+            source=source_label(t, order.source),
+        )
+    ]
+    if order.comment:
+        lines.append(t("order_comment", comment=escape(truncate(order.comment, 300))))
+    return "\n".join(lines)
 
 
 def order_history_line(t: T, entry) -> str:
